@@ -116,7 +116,6 @@ def content2():
 def content3():
     return render_template("content3.html")
 
-
 @app.route("/content4")
 def content4():
     return render_template("content4.html")
