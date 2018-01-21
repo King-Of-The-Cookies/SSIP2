@@ -13,9 +13,9 @@ import pandas as pd
 from scipy import spatial
 
 
-#os.chdir("/Users/guysimons/Documents/BISSmaster/smart service project 1/Final System/WebappRepo/SSIPWebapp/webapp")
+os.chdir("/Users/guysimons/Documents/BISSmaster/smart service project 1/Final System/WebappRepo/SSIPWebapp/webapp")
 
-os.chdir("/Users/lisaherzog/Google Drive/UM/Smart Services/Smart Service Project/SSIP2/webapp")
+#os.chdir("/Users/lisaherzog/Google Drive/UM/Smart Services/Smart Service Project/SSIP2/webapp")
 
 
 """
@@ -57,7 +57,7 @@ def Predict(userVector, similarityMatrix):
 The userItemMatrix is a matrix of 1 (like) and -1 (dislike) values that is used to compute the similarity matrix. 
 """
 
-userItemMatrix = pd.DataFrame(np.random.choice([1,-1], size = (1000,10)), columns = ["Activity1", "Activity2", "Activity3", "Activity4", "Activity5", "Activity6", "Activity7","Activity8","Activity9","Activity10"])
+userItemMatrix = pd.DataFrame(np.random.choice([1,-1], size = (1000,10)), columns = ["dinners", "gym", "holidays","theaters","dancing","instrument"])
 
 """
 The next step is to normalize the user vectors in the userItemMatrix. The purpose of this is to make sure that users with many ratings (those that like everything), contribute less to any individual rating. 
@@ -98,8 +98,6 @@ def home():
 @app.route("/test")
 def test():
      return render_template("test.html")
-
-   
 
 @app.route("/A1food")
 def A1food():
@@ -183,28 +181,34 @@ def bucketlistadd():
 def search():
     return render_template("search.html")
 
-@app.route("/chooseactivity")
-def chooseactivity():
+@app.route("/acitivtyChooser")
+def activityChooser():
      
-     """
-     Call Predict function.
-     """
-     
-     predictedactivity = Predict(userVector ,similarityMatrix)
+     predictedactivity = Predict(userVector,similarityMatrix)
      global currentActivity
      currentActivity = predictedactivity
-     return render_template("chooseactivity.html", predictedactivity = predictedactivity)
+     activityDictionary = {"dinners":"/content1", "gym":"/content2", "holidays":"/content3","theaters":"/content4","dancing":"/content5","instrument":"/content6"}
+     actitivtyToPass = activityDictionary.get(predictedactivity)
+     return redirect(actitivtyToPass)
 
-@app.route('/submitForm', methods=['POST'])
-def catchResponse():
+@app.route('/like', methods=['POST'])
+def catchResponseLike():
      target = request.form['likedActivity']
-     global rating
-     rating = int(target)
-     global currentActivity
-     global userVector
-     userVector[currentActivity] = rating
-     print(userVector)            
-     return redirect('/chooseactivity')
+     global targetChoice
+     targetChoice = target
+     print(targetChoice)
+           
+     return redirect('/activityChooser')
+
+@app.route('/dislike', methods=['POST'])
+def catchResponseDislike():
+     target = request.form['likedActivity']
+     global targetChoice
+     targetChoice = target
+     print(targetChoice)
+           
+     return redirect('/activityChooser')
+
 
 if __name__ == "__main__":
     app.run(port = 5001)
